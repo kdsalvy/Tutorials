@@ -15,7 +15,9 @@ import com.hierynomus.msdtyp.AccessMask;
 import com.hierynomus.msfscc.fileinformation.FileAllInformation;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.msfscc.fileinformation.FileStandardInformation;
+import com.hierynomus.mssmb2.SMB2CreateDisposition;
 import com.hierynomus.mssmb2.SMB2ShareAccess;
+import com.hierynomus.smbj.ProgressListener;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.auth.AuthenticationContext;
 import com.hierynomus.smbj.connection.Connection;
@@ -29,14 +31,15 @@ import jcifs.smb.SmbFileInputStream;
 
 public class NetworkDriveLocationAccess {
 
-    private static String domain = "domain";
-    private static String userName = "username";
-    private static String password = "password";
-    private static String hostname = "hostname";
-    private static String remoteFilePath = "path";
+    private static String domain = "LL";
+    private static String userName = "saukedia1";
+    private static String password = "Pass@may2019";
+    private static String hostname = "WKWIN2407161";
+    private static String sharename = "Users";
+    private static String remoteFilePath = "saukedia1\\Desktop\\POCFolder";
 
     public static void main(String[] args) throws Exception {
-        sharedFolderAccessUsingJCIFSLibrary();
+//        sharedFolderAccessUsingJCIFSLibrary();
         sharedFolderAccessUsingSMBJLibrary();
     }
 
@@ -80,11 +83,20 @@ public class NetworkDriveLocationAccess {
                     .equals("..")) {
                 Set<SMB2ShareAccess> s = new HashSet<>();
                 s.add(SMB2ShareAccess.ALL.iterator().next());
-                File file = share.openFile(currentFilePath, EnumSet.of(AccessMask.READ_CONTROL), null, s, null, null);
-                try (InputStream in = file.getInputStream(); BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in))) {
-                    String content = bufferedReader.lines()
-                        .collect(Collectors.joining("\n"));
-                    System.out.println(content);
+                File file = share.openFile(currentFilePath, EnumSet.of(AccessMask.READ_CONTROL), null, s, SMB2CreateDisposition.FILE_OPEN, null);
+                ProgressListener progressListener = new ProgressListener() {
+                    
+                    @Override
+                    public void onProgressChanged(long numBytes, long totalBytes) {
+                       System.out.println("NetworkDriveLocationAccess.getFile(...).new ProgressListener() {...}.onProgressChanged()");
+                    }
+                };
+                try (InputStream in = file.getInputStream(progressListener)) {
+                    int size = (int)fileStandardInformation.getEndOfFile();
+                    System.out.println(size);
+                    byte[] bytes = new byte[size];
+                    in.read(bytes);
+                    System.out.println(new String(bytes));
                 }
             }
         }
