@@ -28,10 +28,10 @@ import jcifs.smb.SmbFileInputStream;
 
 public class NetworkDriveLocationAccess {
 
-    private static String domain = "LL";
-    private static String userName = "saukedia1";
-    private static String password = "Pass@may2019";
-    private static String remoteFilePath = "\\\\WKWIN2407161\\Users\\saukedia1\\Desktop\\POCFolder";
+    private static String domain = "domain";
+    private static String userName = "username";
+    private static String password = "password";
+    private static String remoteFilePath = "remotepath";
 
     public static void main(String[] args) throws Exception {
         sharedFolderAccessUsingJCIFSLibrary();
