@@ -31,16 +31,18 @@ public class NetworkDriveLocationAccess {
     private static String domain = "domain";
     private static String userName = "username";
     private static String password = "password";
+    private static String remoteFolderPath = "remotepath";
     private static String remoteFilePath = "remotepath";
 
     public static void main(String[] args) throws Exception {
         sharedFolderAccessUsingJCIFSLibrary();
         sharedFolderAccessUsingSMBJLibrary();
+        deleteFile();
     }
 
     private static void sharedFolderAccessUsingJCIFSLibrary() throws IOException {
         NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(domain, userName, password);
-        String sharedSMBPath = "smb:".concat(remoteFilePath);
+        String sharedSMBPath = "smb:".concat(remoteFolderPath);
         System.out.println(sharedSMBPath);
         SmbFile dir = new SmbFile(sharedSMBPath, auth);
         for (SmbFile f : dir.listFiles()) {
@@ -54,7 +56,7 @@ public class NetworkDriveLocationAccess {
 
     private static void sharedFolderAccessUsingSMBJLibrary() throws Exception {
         List<File> files = new ArrayList<>();
-        SmbPath smbPath = SmbPath.parse(remoteFilePath);
+        SmbPath smbPath = SmbPath.parse(remoteFolderPath);
         System.out.println(smbPath.getHostname());
         System.out.println(smbPath.getShareName());
         System.out.println(smbPath.getPath());
@@ -93,6 +95,18 @@ public class NetworkDriveLocationAccess {
                     file.read(baos);
                     System.out.println(baos.toString());
                 }
+            }
+        }
+    }
+    
+    private static void deleteFile() throws IOException {
+        SmbPath smbPath = SmbPath.parse(remoteFilePath);
+        try (SMBClient client = new SMBClient(); Connection connection = client.connect(smbPath.getHostname())) {
+            AuthenticationContext ac = new AuthenticationContext(userName, password.toCharArray(), domain);
+            Session session = connection.authenticate(ac);
+
+            try (DiskShare share = (DiskShare) session.connectShare(smbPath.getShareName())) {
+               share.rm(smbPath.getPath());
             }
         }
     }
