@@ -2,6 +2,7 @@ package network.drive.access;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -30,7 +31,7 @@ public class NetworkDriveLocationAccess {
 
     private static String domain = "domain";
     private static String userName = "username";
-    private static String password = "password";
+    private static String password = "Password";
     private static String remoteFolderPath = "remotepath";
     private static String remoteFilePath = "remotepath";
 
@@ -83,12 +84,13 @@ public class NetworkDriveLocationAccess {
             } else if (!f.getFileName()
                 .equals(".")
                 && !f.getFileName()
-                    .equals("..")) {
+                    .equals("..") && f.getFileName().matches("file.txt")) {
                 Set<SMB2ShareAccess> s = new HashSet<>();
                 s.add(SMB2ShareAccess.ALL.iterator()
                     .next());
                 try (File file = share.openFile(currentFilePath, EnumSet.of(AccessMask.GENERIC_READ), null, s, SMB2CreateDisposition.FILE_OPEN, null)) {
                     System.out.println(f.getFileName());
+                    System.out.println(Paths.get(file.getDiskShare().getSmbPath().toUncPath(), currentFilePath));
                     int size = (int) fileStandardInformation.getEndOfFile();
                     System.out.println(size);
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
