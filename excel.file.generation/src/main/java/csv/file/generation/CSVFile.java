@@ -24,30 +24,40 @@ public class CSVFile {
         }
         return records;
     }
-    
+
     public static void appendToCSV(String filePath, List<String> headers, List<String> values) throws IOException {
         File csvOutputFile = new File(filePath);
         List<List<String>> records = new ArrayList<>();
-        
-        if(!csvOutputFile.exists())
+
+        if (!csvOutputFile.exists())
             csvOutputFile.createNewFile();
         else
             records.addAll(readCSV(filePath));
         records.add(headers);
         records.add(values);
-        
+
         try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
             records.stream()
-              .map(CSVFile::convertToCSV)
-              .forEach(pw::println);
+                .map(CSVFile::convertToCSV)
+                .forEach(pw::println);
         }
     }
-    
+
+    public static String escapeSpecialCharacters(String data) {
+        String escapedData = data.replaceAll("\\R", " ");
+        if (data.contains(",") || data.contains("\"") || data.contains("'")) {
+            data = data.replace("\"", "\"\"");
+            escapedData = "\"" + data + "\"";
+        }
+        return escapedData;
+    }
+
     public static String convertToCSV(List<String> data) {
         return data.stream()
-          .collect(Collectors.joining(","));
+            .map(CSVFile::escapeSpecialCharacters)
+            .collect(Collectors.joining(","));
     }
-    
+
     public static void main(String... args) {
         /*Arrays.asList("Apple", "Aeroplane", "Axe");
         Arrays.asList("Boy", "Ball", "Balloon");
