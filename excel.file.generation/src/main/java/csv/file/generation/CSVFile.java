@@ -18,7 +18,8 @@ public class CSVFile {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = br.readLine()) != null) {
-                String[] values = line.split(",");
+                line = line.substring(1, line.length() - 1);
+                String[] values = line.split("\",\"");
                 records.add(Arrays.asList(values));
             }
         }
@@ -45,10 +46,7 @@ public class CSVFile {
 
     public static String escapeSpecialCharacters(String data) {
         String escapedData = data.replaceAll("\\R", " ");
-        if (data.contains(",") || data.contains("\"") || data.contains("'")) {
-            data = data.replace("\"", "\"\"");
-            escapedData = "\"" + data + "\"";
-        }
+        escapedData = "\"" + data + "\"";
         return escapedData;
     }
 
@@ -64,7 +62,7 @@ public class CSVFile {
         Arrays.asList("Cat", "Car", "Comb");
         Arrays.asList("Dog", "Dart", "Deer");*/
         try {
-            appendToCSV("./demo.csv", Arrays.asList("A", "B", "C", "D"), Arrays.asList("Axe", "Balloon", "Comb", "Deer"));
+            appendToCSV("./demo.csv", Arrays.asList("A", "B,", "C", "D"), Arrays.asList("Axe", "Balloon,Ball,Boy", "Comb", "Deer"));
         } catch (IOException e) {
             e.printStackTrace();
         }
