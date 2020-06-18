@@ -44,6 +44,11 @@ public class CSVFile {
         }
     }
 
+    /** 
+     * Handles value that contains comma
+     * @param data
+     * @return
+     */
     public static String escapeSpecialCharacters(String data) {
         String escapedData = data.replaceAll("\\R", " ");
         escapedData = "\"" + data + "\"";
@@ -62,7 +67,7 @@ public class CSVFile {
         Arrays.asList("Cat", "Car", "Comb");
         Arrays.asList("Dog", "Dart", "Deer");*/
         try {
-            appendToCSV("./demo.csv", Arrays.asList("A", "B,", "C", "D"), Arrays.asList("Axe", "Balloon,Ball,Boy", "Comb", "Deer"));
+            appendToCSV("./demo.csv", Arrays.asList("A", "B,", "C"), Arrays.asList("Axe", "[Balloon,Ball,Boy]", "Comb"));
         } catch (IOException e) {
             e.printStackTrace();
         }
